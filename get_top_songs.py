@@ -4,23 +4,14 @@
 import time
 import numpy as np
 import selenium
-import pyautogui
+import json
 from selenium import webdriver
 from webdriver_manager.chrome import ChromeDriverManager
-
-#import google_auth_oauthlib.flow
-#import googleapiclient.discovery
-#import googleapiclient.errors
-#import requests
-#import youtube_dl
-#from exceptions import ResponseException
-#from exceptions import ResponseException
-#from secrets import spotify_token, spotify_user_id
+from secrets import spotify_user_id, spotify_password
 
 
-
-userlogin = input('Enter username: ') # reb1221
-passwordlogin = input('Enter password: ') # Xq3Ws5m@5U2D
+userid = str(spotify_user_id)
+password = str(spotify_password)
 time.sleep(1)
 
 
@@ -31,11 +22,11 @@ PATH = "/users/rebridge/Spotify Automation/chromedriver"
 driver.get("https://accounts.spotify.com/en/authorize?client_id=09793e3afafa4797bf853f2ad5db72f3&redirect_uri=http://107.170.81.187:8080/SpotifyLoginCallback/&response_type=code&scope=user-read-recently-played+user-library-read+user-top-read&show_dialog=false&state=34fFs29kd09")
 
 username = driver.find_element_by_id('login-username')
-username.send_keys(str(userlogin))
+username.send_keys(str(userid))
 time.sleep(1)
 
-password = driver.find_element_by_id('login-password')
-password.send_keys(str(passwordlogin)) #what a poopy password
+passwordlogin = driver.find_element_by_id('login-password')
+passwordlogin.send_keys(str(password))
 time.sleep(1)
 
 login = driver.find_element_by_id('login-button')
@@ -49,22 +40,22 @@ if driver.current_url == 'https://accounts.spotify.com/en/authorize?client_id=09
     agree = driver.find_element_by_id('auth-accept')
     agree.click()
 else :
-    time.sleep(7)
+    time.sleep(3)
 
 #refreshes webpage
-pyautogui.keyDown('command')
-pyautogui.press('r')
-pyautogui.keyUp('command')
-time.sleep(3)
+driver.refresh()
+time.sleep(2)
 
+#saves songs
 tracks_element = driver.find_element_by_xpath('/html/body/ol[4]')
 tracks = tracks_element.text
 songs = [tracks]
-songnumber = len(songs)
-i = 0
-#print('[%s]' % ', '.join(map(str, songs)))
-#print(tracks)
+songs_json = json.dumps(songs)
 
-# collect sorngs into an array
+
+
+# saves songs to .txt file
 np.savetxt("top_songs_of_the_month.txt", np.array(songs), fmt="%s")
 driver.close()
+
+# will save the songs to a text doc in the same directory as this file
